@@ -1,65 +1,162 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import Link from 'next/link';
+import { Code2, Network, Shield, Database, ArrowRight, Zap } from 'lucide-react';
+
+export default function LandingPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="min-h-screen bg-slate-900">
+      {/* Header */}
+      <header className="border-b border-slate-700">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-white">
+            DeepDive Dev
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+          <div className="flex gap-4">
+            <Link
+              href="/login"
+              className="px-4 py-2 text-slate-300 hover:text-white transition-colors"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              ログイン
+            </Link>
+            <Link
+              href="/login"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              無料で始める
+            </Link>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </header>
+
+      {/* Hero Section */}
+      <section className="max-w-7xl mx-auto px-4 py-20 text-center">
+        <h2 className="text-5xl font-bold text-white mb-6">
+          「動く仕組み」を可視化する<br />
+          実戦的Web学習プラットフォーム
+        </h2>
+        <p className="text-xl text-slate-400 mb-8 max-w-3xl mx-auto">
+          コードは書けるが中身がわからない、を解決。
+          ネットワーク、セキュリティ、パフォーマンスなど
+          実務で必要な「非機能要件」を体験しながら学ぶ。
+        </p>
+        <Link
+          href="/login"
+          className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 text-white rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors"
+        >
+          学習を始める
+          <ArrowRight className="w-5 h-5" />
+        </Link>
+      </section>
+
+      {/* Features */}
+      <section className="max-w-7xl mx-auto px-4 py-16">
+        <h3 className="text-3xl font-bold text-white text-center mb-12">
+          主要機能
+        </h3>
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <FeatureCard
+            icon={<Network className="w-8 h-8" />}
+            title="内部構造可視化"
+            description="リクエストフロー、TCPハンドシェイク、TLS暗号化プロセスをアニメーションで表示"
+          />
+          <FeatureCard
+            icon={<Code2 className="w-8 h-8" />}
+            title="トラブルシューティング演習"
+            description="N+1問題、CORSエラー、XSS脆弱性など実践的なバグ修正課題"
+          />
+          <FeatureCard
+            icon={<Zap className="w-8 h-8" />}
+            title="AIアーキテクト・レビュー"
+            description="修正コードに対するフィードバックと理論的背景の解説"
+          />
+          <FeatureCard
+            icon={<Shield className="w-8 h-8" />}
+            title="実務スキル証明"
+            description="カテゴリ別スコアと解決事例のリスト化でスキルを可視化"
+          />
         </div>
-      </main>
+      </section>
+
+      {/* Categories */}
+      <section className="max-w-7xl mx-auto px-4 py-16">
+        <h3 className="text-3xl font-bold text-white text-center mb-12">
+          学習カテゴリ
+        </h3>
+        <div className="grid md:grid-cols-4 gap-6">
+          <CategoryCard
+            icon={<Network className="w-6 h-6" />}
+            title="Network"
+            description="HTTP, DNS, TCP/IP, CORS"
+            color="bg-blue-500"
+          />
+          <CategoryCard
+            icon={<Database className="w-6 h-6" />}
+            title="Database"
+            description="SQL最適化, N+1問題, インデックス"
+            color="bg-green-500"
+          />
+          <CategoryCard
+            icon={<Shield className="w-6 h-6" />}
+            title="Security"
+            description="XSS, CSRF, SQLインジェクション"
+            color="bg-red-500"
+          />
+          <CategoryCard
+            icon={<Zap className="w-6 h-6" />}
+            title="Performance"
+            description="キャッシュ, 非同期処理, 負荷分散"
+            color="bg-yellow-500"
+          />
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-slate-700 mt-16">
+        <div className="max-w-7xl mx-auto px-4 py-8 text-center text-slate-400">
+          <p>&copy; 2024 DeepDive Dev. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+function FeatureCard({
+  icon,
+  title,
+  description,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="p-6 bg-slate-800 rounded-lg border border-slate-700">
+      <div className="text-blue-400 mb-4">{icon}</div>
+      <h4 className="text-lg font-semibold text-white mb-2">{title}</h4>
+      <p className="text-slate-400 text-sm">{description}</p>
+    </div>
+  );
+}
+
+function CategoryCard({
+  icon,
+  title,
+  description,
+  color,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  color: string;
+}) {
+  return (
+    <div className="p-6 bg-slate-800 rounded-lg border border-slate-700 hover:border-slate-600 transition-colors cursor-pointer">
+      <div className={`inline-flex p-2 rounded-lg ${color} text-white mb-4`}>
+        {icon}
+      </div>
+      <h4 className="text-lg font-semibold text-white mb-2">{title}</h4>
+      <p className="text-slate-400 text-sm">{description}</p>
     </div>
   );
 }
