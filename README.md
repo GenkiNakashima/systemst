@@ -259,3 +259,171 @@ export default function WorkspaceLayout({ scenarioId }) {
     </div>
   );
 }
+```
+
+---
+
+## 6. 開発環境セットアップ・実行手順
+
+### 6.1. 必要な環境
+
+- **Node.js**: 18.x 以上
+- **PHP**: 8.2 以上
+- **Composer**: 2.x 以上
+- **PostgreSQL**: 14 以上（本番環境用）
+- **SQLite**: 開発環境用（デフォルト）
+
+### 6.2. フロントエンドのセットアップ
+
+```bash
+# フロントエンドディレクトリに移動
+cd frontend
+
+# 依存パッケージのインストール
+npm install
+
+# 開発サーバーの起動
+npm run dev
+```
+
+フロントエンドは `http://localhost:3000` でアクセスできます。
+
+### 6.3. バックエンドのセットアップ
+
+```bash
+# バックエンドディレクトリに移動
+cd backend
+
+# 依存パッケージのインストール
+composer install
+
+# 環境設定ファイルのコピー
+cp .env.example .env
+
+# アプリケーションキーの生成
+php artisan key:generate
+```
+
+### 6.4. データベースの設定
+
+#### SQLite（開発環境・推奨）
+
+```bash
+# SQLiteファイルの作成
+touch database/database.sqlite
+
+# .envファイルを編集
+# DB_CONNECTION=sqlite
+# DB_DATABASE=/absolute/path/to/database/database.sqlite
+```
+
+#### PostgreSQL（本番環境）
+
+`.env` ファイルを編集:
+
+```
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=deepdive_dev
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+```
+
+### 6.5. マイグレーションとシーディング
+
+```bash
+# データベースのマイグレーション
+php artisan migrate
+
+# シードデータの投入
+php artisan db:seed
+```
+
+### 6.6. バックエンドサーバーの起動
+
+```bash
+# 開発サーバーの起動
+php artisan serve
+```
+
+バックエンドAPIは `http://localhost:8000` でアクセスできます。
+
+### 6.7. テストユーザー
+
+シーディング後、以下のテストユーザーが利用可能です：
+
+- **メール**: test@example.com
+- **パスワード**: password
+
+### 6.8. API エンドポイント
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/register` | ユーザー登録 |
+| POST | `/api/login` | ログイン |
+| POST | `/api/logout` | ログアウト（要認証） |
+| GET | `/api/user` | 現在のユーザー情報（要認証） |
+| GET | `/api/scenarios` | シナリオ一覧 |
+| GET | `/api/scenarios/{id}` | シナリオ詳細 |
+| POST | `/api/attempts` | 回答の作成（要認証） |
+| POST | `/api/attempts/{id}/submit` | 回答の提出・採点（要認証） |
+| GET | `/api/attempts/history` | 回答履歴（要認証） |
+| GET | `/api/skills` | スキルマトリックス取得（要認証） |
+| PUT | `/api/skills` | スキルマトリックス更新（要認証） |
+
+### 6.9. 本番環境へのデプロイ
+
+#### フロントエンド（Vercel / AWS Amplify）
+
+1. Vercelアカウントを作成
+2. GitHubリポジトリと連携
+3. `frontend` ディレクトリをルートに設定
+4. 環境変数 `NEXT_PUBLIC_API_URL` を設定
+
+#### バックエンド（AWS ECS / Heroku）
+
+1. Docker イメージをビルド
+2. ECR にプッシュ
+3. ECS タスク定義を作成
+4. 環境変数（DB接続、APP_KEY等）を設定
+
+### 6.10. 追加設定（オプション）
+
+#### AI機能の有効化
+
+OpenAI API または Gemini API を使用する場合、`.env` に以下を追加：
+
+```
+OPENAI_API_KEY=your_api_key
+# または
+GEMINI_API_KEY=your_api_key
+```
+
+#### CORS設定のカスタマイズ
+
+`config/cors.php` でフロントエンドのオリジンを許可：
+
+```php
+'allowed_origins' => ['http://localhost:3000', 'https://your-domain.com'],
+```
+
+---
+
+## 7. トラブルシューティング
+
+### よくある問題
+
+1. **CORS エラー**
+   - バックエンドの `config/cors.php` でフロントエンドのオリジンを許可しているか確認
+
+2. **データベース接続エラー**
+   - `.env` ファイルのDB設定を確認
+   - PostgreSQLの場合、PDOエクステンションがインストールされているか確認
+
+3. **npm install でエラー**
+   - Node.js のバージョンを確認（18.x 以上）
+   - `node_modules` を削除して再インストール
+
+4. **Monaco Editor が表示されない**
+   - クライアントサイドのみで動作するため、SSRが無効になっているか確認
