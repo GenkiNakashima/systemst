@@ -22,6 +22,7 @@ import {
   Trophy,
   Target,
   Clock,
+  Share2,
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -102,6 +103,13 @@ export default function DashboardPage() {
             DeepDive Dev
           </Link>
           <div className="flex items-center gap-4">
+            <Link href="/scenarios" className="text-slate-300 hover:text-white">
+              シナリオ
+            </Link>
+            <Link href="/share" className="flex items-center gap-2 text-slate-300 hover:text-white">
+              <Share2 className="w-4 h-4" />
+              共有
+            </Link>
             <span className="text-slate-300">
               {user?.name} (Lv.{user?.currentLevel})
             </span>

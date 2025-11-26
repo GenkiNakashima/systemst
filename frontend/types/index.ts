@@ -68,3 +68,35 @@ export interface ChatMessage {
   content: string;
   timestamp: string;
 }
+
+export interface Post {
+  id: string;
+  user_id: string;
+  user: User;
+  content: string;
+  is_ai_flagged: boolean;
+  ai_flag_reason: string | null;
+  reactions_count: number;
+  has_reacted: boolean;
+  replies: Reply[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Reply {
+  id: string;
+  post_id: string;
+  user_id: string | null;
+  user: User | null;
+  content: string;
+  is_ai_response: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PostReaction {
+  id: string;
+  post_id: string;
+  user_id: string;
+  created_at: string;
+}
