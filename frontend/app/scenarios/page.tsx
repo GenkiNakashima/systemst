@@ -9,12 +9,13 @@ import {
   Database,
   Shield,
   Zap,
+  Cpu,
   Search,
   Filter,
   ArrowLeft,
 } from 'lucide-react';
 
-type Category = 'All' | 'Network' | 'Database' | 'Security' | 'Performance';
+type Category = 'All' | 'Network' | 'Database' | 'Security' | 'Performance' | 'OS';
 
 const mockScenarios = [
   {
@@ -87,6 +88,62 @@ const mockScenarios = [
     difficulty: 5,
     description: '重い処理をキューに入れて非同期実行し、レスポンス時間を改善する',
   },
+  {
+    id: '11',
+    title: 'トランザクションと排他制御',
+    category: 'Database' as const,
+    difficulty: 4,
+    description: '銀行の送金処理で同時アクセス時にデータ不整合が発生。トランザクション分離レベルとロックを実装せよ',
+  },
+  {
+    id: '12',
+    title: '計算量を最適化せよ（O(n²) → O(n)）',
+    category: 'Performance' as const,
+    difficulty: 3,
+    description: '1000万件のデータから重複を検出する処理が遅い。O(n²)の二重ループをハッシュマップでO(n)に改善せよ',
+  },
+  {
+    id: '13',
+    title: 'HTTPステータスコードとエラーハンドリング',
+    category: 'Network' as const,
+    difficulty: 2,
+    description: 'APIがエラー時に常に200を返している。適切なステータスコード（400, 401, 404, 500等）を実装せよ',
+  },
+  {
+    id: '14',
+    title: 'RESTful API設計の原則',
+    category: 'Network' as const,
+    difficulty: 3,
+    description: '既存のエンドポイント設計がRESTの原則に違反している。適切なHTTPメソッドとURIに修正せよ',
+  },
+  {
+    id: '15',
+    title: 'レースコンディションを防げ',
+    category: 'OS' as const,
+    difficulty: 4,
+    description: 'マルチスレッドでカウンターを増やす処理で値がおかしくなる。排他制御（Mutex）を実装せよ',
+  },
+  {
+    id: '16',
+    title: 'プロセスとスレッドの違いを理解せよ',
+    category: 'OS' as const,
+    difficulty: 2,
+    description: 'Webサーバーの並行処理モデル。Apache（プロセス）とNginx（イベント駆動）の違いを学ぶ',
+  },
+  {
+    id: '17',
+    title: 'スタックオーバーフローを回避せよ',
+    category: 'OS' as const,
+    difficulty: 3,
+    description: '深い再帰処理でスタックオーバーフロー。メモリ構造を理解し、反復処理に変換せよ',
+  },
+  {
+    id: '18',
+    title: 'メモリリークを検出せよ',
+    category: 'OS' as const,
+    difficulty: 4,
+    description: '長時間稼働するワーカープロセスでメモリ使用量が増え続ける。循環参照を解消せよ',
+  },
 ];
 
 const categoryConfig = {
@@ -94,6 +151,7 @@ const categoryConfig = {
   Database: { icon: Database, color: 'bg-green-500', textColor: 'text-green-400' },
   Security: { icon: Shield, color: 'bg-red-500', textColor: 'text-red-400' },
   Performance: { icon: Zap, color: 'bg-yellow-500', textColor: 'text-yellow-400' },
+  OS: { icon: Cpu, color: 'bg-purple-500', textColor: 'text-purple-400' },
 };
 
 export default function ScenariosPage() {
@@ -121,7 +179,7 @@ export default function ScenariosPage() {
     return matchesCategory && matchesSearch;
   });
 
-  const categories: Category[] = ['All', 'Network', 'Database', 'Security', 'Performance'];
+  const categories: Category[] = ['All', 'Network', 'Database', 'Security', 'Performance', 'OS'];
 
   return (
     <div className="min-h-screen bg-slate-900">
