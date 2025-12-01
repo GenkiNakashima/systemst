@@ -622,3 +622,292 @@ php artisan db:seed --class=ScenarioSeeder
 - **AIフィードバックの高度化**: GPT-4やGemini連携による詳細な解説
 
 ---
+
+---
+
+## 9. Docker を使った環境構築
+
+### 9.1. Docker 構成
+
+プロジェクトには以下のDockerファイルが含まれています：
+
+**プロジェクトルート:**
+- `docker-compose.yml` - 本番環境用
+- `docker-compose.dev.yml` - 開発環境用（ホットリロード対応）
+- `.dockerignore` - Docker ビルド時の除外ファイル
+
+**バックエンド:**
+- `backend/Dockerfile` - Laravel PHP 8.2 環境
+- `backend/.dockerignore` - バックエンド用除外ファイル
+
+**フロントエンド:**
+- `frontend/Dockerfile` - Next.js Node 18 環境
+- `frontend/.dockerignore` - フロントエンド用除外ファイル
+
+### 9.2. Docker サービス構成
+
+| サービス名 | 説明 | ポート | 依存関係 |
+|-----------|------|--------|---------|
+| `db` | PostgreSQL 14 | 5432 | - |
+| `backend` | Laravel API | 8000 | db |
+| `frontend` | Next.js アプリ | 3000 | backend |
+
+### 9.3. 開発環境での起動手順
+
+#### 初回起動
+
+```bash
+# プロジェクトルートで実行
+docker-compose -f docker-compose.dev.yml up -d
+
+# 起動確認
+docker-compose -f docker-compose.dev.yml ps
+
+# ログ確認
+docker-compose -f docker-compose.dev.yml logs -f
+```
+
+**起動が完了したら:**
+- フロントエンド: http://localhost:3000
+- バックエンドAPI: http://localhost:8000
+- データベース: localhost:5432
+
+#### 2回目以降の起動
+
+```bash
+# 起動
+docker-compose -f docker-compose.dev.yml up -d
+
+# 停止
+docker-compose -f docker-compose.dev.yml down
+
+# 停止（データベースも削除）
+docker-compose -f docker-compose.dev.yml down -v
+```
+
+### 9.4. 本番環境での起動手順
+
+```bash
+# APP_KEYを生成（初回のみ）
+cd backend
+php artisan key:generate
+# .envファイルからAPP_KEYをコピー
+
+# docker-compose.ymlのAPP_KEYを更新
+# APP_KEY: base64:YOUR_APP_KEY_HERE を実際の値に置き換え
+
+# ビルド & 起動
+docker-compose up -d --build
+
+# 確認
+docker-compose ps
+```
+
+### 9.5. よく使うDockerコマンド
+
+#### コンテナの管理
+
+```bash
+# 全サービスの起動
+docker-compose up -d
+
+# 特定のサービスのみ起動
+docker-compose up -d backend
+
+# 全サービスの停止
+docker-compose down
+
+# ログ確認（リアルタイム）
+docker-compose logs -f
+
+# 特定のサービスのログ
+docker-compose logs -f backend
+
+# コンテナの状態確認
+docker-compose ps
+
+# コンテナの再起動
+docker-compose restart backend
+```
+
+#### データベース操作
+
+```bash
+# DBコンテナに接続
+docker-compose exec db psql -U deepdive_user -d deepdive_dev
+
+# マイグレーション実行
+docker-compose exec backend php artisan migrate
+
+# シーダー実行
+docker-compose exec backend php artisan db:seed
+
+# マイグレーションのリセット（全データ削除）
+docker-compose exec backend php artisan migrate:fresh --seed
+```
+
+#### バックエンドのコマンド実行
+
+```bash
+# Artisan コマンド実行
+docker-compose exec backend php artisan [command]
+
+# Composer パッケージ追加
+docker-compose exec backend composer require [package]
+
+# Laravelのキャッシュクリア
+docker-compose exec backend php artisan cache:clear
+docker-compose exec backend php artisan config:clear
+docker-compose exec backend php artisan route:clear
+```
+
+#### フロントエンドのコマンド実行
+
+```bash
+# npm パッケージ追加
+docker-compose exec frontend npm install [package]
+
+# ビルド実行
+docker-compose exec frontend npm run build
+
+# 開発サーバー再起動
+docker-compose restart frontend
+```
+
+### 9.6. トラブルシューティング（Docker）
+
+#### 1. ポートが既に使用されている
+
+```bash
+# ポート使用状況の確認
+lsof -i :3000
+lsof -i :8000
+lsof -i :5432
+
+# プロセスを停止してから再起動
+docker-compose down
+docker-compose up -d
+```
+
+#### 2. データベース接続エラー
+
+```bash
+# DBコンテナが起動しているか確認
+docker-compose ps db
+
+# DBのヘルスチェック
+docker-compose exec db pg_isready -U deepdive_user
+
+# DB接続情報の確認
+docker-compose exec backend cat .env | grep DB_
+```
+
+#### 3. コンテナが起動しない
+
+```bash
+# ログで原因を確認
+docker-compose logs backend
+docker-compose logs frontend
+
+# コンテナを完全に削除して再ビルド
+docker-compose down -v
+docker-compose up -d --build
+```
+
+#### 4. フロントエンドのホットリロードが効かない
+
+開発環境用の `docker-compose.dev.yml` を使用してください：
+
+```bash
+docker-compose -f docker-compose.dev.yml up -d
+```
+
+#### 5. 依存関係のエラー
+
+```bash
+# バックエンド
+docker-compose exec backend composer install
+
+# フロントエンド
+docker-compose exec frontend npm install
+
+# 完全クリーン
+docker-compose down -v
+rm -rf backend/vendor frontend/node_modules
+docker-compose up -d --build
+```
+
+### 9.7. Docker環境の削除
+
+プロジェクト全体を削除する場合：
+
+```bash
+# コンテナ、ネットワーク、ボリュームを全て削除
+docker-compose down -v
+
+# イメージも削除
+docker-compose down -v --rmi all
+
+# システム全体のクリーンアップ（注意：他のプロジェクトにも影響）
+docker system prune -a --volumes
+```
+
+### 9.8. 環境変数の設定
+
+#### バックエンド（.env）
+
+`backend/.env.example` をコピーして設定：
+
+```bash
+DB_CONNECTION=pgsql
+DB_HOST=db  # Docker内部ではサービス名を使用
+DB_PORT=5432
+DB_DATABASE=deepdive_dev
+DB_USERNAME=deepdive_user
+DB_PASSWORD=deepdive_pass
+
+CORS_ALLOWED_ORIGINS=http://localhost:3000
+```
+
+#### フロントエンド（.env.local）
+
+`frontend/.env.local` を作成：
+
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
+
+### 9.9. パフォーマンス最適化
+
+#### Mac/Windows での volume マウントの高速化
+
+`docker-compose.dev.yml` で以下のように設定すると高速化されます：
+
+```yaml
+volumes:
+  - ./backend:/var/www/html:cached
+  - ./frontend:/app:cached
+```
+
+### 9.10. 本番デプロイ時の注意点
+
+1. **環境変数の設定**
+   - `APP_KEY` を必ず生成して設定
+   - `APP_DEBUG=false` に設定
+   - データベース認証情報を強固なものに変更
+
+2. **セキュリティ**
+   - デフォルトのパスワードを変更
+   - 不要なポートを公開しない
+   - HTTPS/TLS を設定
+
+3. **パフォーマンス**
+   - `npm run build` でフロントエンドを最適化
+   - `composer install --optimize-autoloader --no-dev`
+   - Laravel のキャッシュを有効化
+
+4. **データ永続化**
+   - ボリュームを確実にバックアップ
+   - データベースのバックアップ戦略を立てる
+
+---

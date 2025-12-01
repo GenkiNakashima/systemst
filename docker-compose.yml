@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:14-alpine
+    container_name: deepdive-db
+    environment:
+      POSTGRES_DB: deepdive_dev
+      POSTGRES_USER: deepdive_user
+      POSTGRES_PASSWORD: deepdive_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - deepdive-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U deepdive_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Laravel Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: deepdive-backend
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: deepdive_dev
+      DB_USERNAME: deepdive_user
+      DB_PASSWORD: deepdive_pass
+      APP_KEY: base64:YOUR_APP_KEY_HERE
+      APP_ENV: local
+      APP_DEBUG: true
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/var/www/html
+      - /var/www/html/vendor
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - deepdive-network
+    command: >
+      sh -c "
+        php artisan migrate --force &&
+        php artisan db:seed --force &&
+        php artisan serve --host=0.0.0.0 --port=8000
+      "
+
+  # Next.js Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: deepdive-frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - backend
+    networks:
+      - deepdive-network
+
+networks:
+  deepdive-network:
+    driver: bridge
+
+volumes:
+  db_data:
