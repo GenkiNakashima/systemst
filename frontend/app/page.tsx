@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Code2, Network, Shield, Database, ArrowRight, Zap } from 'lucide-react';
+import { Code2, Network, Shield, Database, ArrowRight, Zap, Cpu } from 'lucide-react';
 
 export default function LandingPage() {
   return (
@@ -83,17 +83,17 @@ export default function LandingPage() {
         <h3 className="text-3xl font-bold text-white text-center mb-12">
           学習カテゴリ
         </h3>
-        <div className="grid md:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-5 gap-4">
           <CategoryCard
             icon={<Network className="w-6 h-6" />}
             title="Network"
-            description="HTTP, DNS, TCP/IP, CORS"
+            description="HTTP/HTTPS, TCP/IP, DNS, CORS, RESTful API"
             color="bg-blue-500"
           />
           <CategoryCard
             icon={<Database className="w-6 h-6" />}
             title="Database"
-            description="SQL最適化, N+1問題, インデックス"
+            description="N+1, インデックス, トランザクション, ACID"
             color="bg-green-500"
           />
           <CategoryCard
@@ -105,8 +105,14 @@ export default function LandingPage() {
           <CategoryCard
             icon={<Zap className="w-6 h-6" />}
             title="Performance"
-            description="キャッシュ, 非同期処理, 負荷分散"
+            description="計算量, アルゴリズム, キャッシュ戦略"
             color="bg-yellow-500"
+          />
+          <CategoryCard
+            icon={<Cpu className="w-6 h-6" />}
+            title="OS"
+            description="並行処理, メモリ管理, プロセス/スレッド"
+            color="bg-purple-500"
           />
         </div>
       </section>

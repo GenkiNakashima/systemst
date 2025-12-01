@@ -9,7 +9,7 @@ export interface User {
 export interface Scenario {
   id: string;
   title: string;
-  category: 'Network' | 'Security' | 'DB' | 'Performance';
+  category: 'Network' | 'Security' | 'Database' | 'Performance' | 'OS';
   difficulty: number;
   description: string;
   environmentConfig: Record<string, unknown>;
@@ -39,6 +39,7 @@ export interface SkillMatrix {
   dbScore: number;
   securityScore: number;
   performanceScore: number;
+  osScore?: number;
 }
 
 export interface VisualizerData {

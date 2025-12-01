@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:14-alpine
+    container_name: deepdive-db-dev
+    environment:
+      POSTGRES_DB: deepdive_dev
+      POSTGRES_USER: deepdive_user
+      POSTGRES_PASSWORD: deepdive_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - deepdive-network
+
+  # Laravel Backend (Development)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: deepdive-backend-dev
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: deepdive_dev
+      DB_USERNAME: deepdive_user
+      DB_PASSWORD: deepdive_pass
+      APP_ENV: local
+      APP_DEBUG: true
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/var/www/html
+    depends_on:
+      - db
+    networks:
+      - deepdive-network
+    command: >
+      sh -c "
+        composer install &&
+        php artisan key:generate &&
+        php artisan migrate --seed &&
+        php artisan serve --host=0.0.0.0 --port=8000
+      "
+
+  # Next.js Frontend (Development)
+  frontend:
+    image: node:18-alpine
+    container_name: deepdive-frontend-dev
+    working_dir: /app
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - backend
+    networks:
+      - deepdive-network
+    command: sh -c "npm install && npm run dev"
+
+networks:
+  deepdive-network:
+    driver: bridge
+
+volumes:
+  db_data:
